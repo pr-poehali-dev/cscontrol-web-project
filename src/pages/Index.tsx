@@ -26,6 +26,32 @@ interface Task {
   completed: boolean;
 }
 
+interface User {
+  id: number;
+  name: string;
+  role: string;
+  position: string;
+  birthday: string;
+  online: boolean;
+  password: string;
+}
+
+interface WarehouseItem {
+  id: number;
+  name: string;
+  quantity: number;
+  category: string;
+}
+
+interface Lamp {
+  id: number;
+  hallId: number;
+  name: string;
+  installDate: string;
+  workingHours: number;
+  maxHours: number;
+}
+
 const Index = () => {
   const [currentUser, setCurrentUser] = useState<string>('admin');
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -54,6 +80,35 @@ const Index = () => {
     location: '',
     urgent: false
   });
+
+  const [users, setUsers] = useState<User[]>([
+    { id: 1, name: 'Администратор', role: 'admin', position: 'Главный администратор', birthday: '1985-05-15', online: true, password: '0000' },
+    { id: 2, name: 'Иван Петров', role: 'operator', position: 'Оператор зала', birthday: '1990-08-20', online: false, password: '1234' },
+    { id: 3, name: 'Мария Сидорова', role: 'tech', position: 'Технический специалист', birthday: '1988-12-10', online: true, password: '5678' },
+  ]);
+
+  const [warehouse, setWarehouse] = useState<WarehouseItem[]>([
+    { id: 1, name: 'Лампа проектора EPSON', quantity: 5, category: 'Лампы' },
+    { id: 2, name: 'Лампа проектора SONY', quantity: 3, category: 'Лампы' },
+    { id: 3, name: 'Кабель HDMI', quantity: 15, category: 'Кабели' },
+    { id: 4, name: 'Пульт управления', quantity: 8, category: 'Аксессуары' },
+  ]);
+
+  const [lamps, setLamps] = useState<Lamp[]>([
+    { id: 1, hallId: 1, name: 'Лампа проектора EPSON', installDate: '2024-01-15', workingHours: 1650, maxHours: 1700 },
+    { id: 2, hallId: 2, name: 'Лампа проектора SONY', installDate: '2024-02-20', workingHours: 800, maxHours: 1500 },
+    { id: 3, hallId: 3, name: 'Лампа проектора EPSON', installDate: '2024-03-10', workingHours: 1200, maxHours: 1700 },
+    { id: 4, hallId: 4, name: 'Лампа проектора SONY', installDate: '2024-01-30', workingHours: 1450, maxHours: 1500 },
+    { id: 5, hallId: 5, name: 'Лампа проектора EPSON', installDate: '2024-04-05', workingHours: 900, maxHours: 1700 },
+    { id: 6, hallId: 6, name: 'Лампа проектора SONY', installDate: '2024-02-15', workingHours: 1100, maxHours: 1500 },
+    { id: 7, hallId: 7, name: 'Лампа проектора EPSON', installDate: '2024-03-25', workingHours: 600, maxHours: 1700 },
+    { id: 8, hallId: 8, name: 'Лампа проектора SONY', installDate: '2024-04-10', workingHours: 300, maxHours: 1500 },
+  ]);
+
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [isAddWarehouseOpen, setIsAddWarehouseOpen] = useState(false);
+  const [newWarehouseItem, setNewWarehouseItem] = useState({ name: '', quantity: 0, category: '' });
+  const [newUser, setNewUser] = useState({ name: '', role: '', position: '', birthday: '', password: '' });
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -140,7 +195,7 @@ const Index = () => {
 
       <div className="max-w-7xl mx-auto p-6">
         <Tabs defaultValue="halls" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className={`grid w-full ${currentUser === 'admin' ? 'grid-cols-6' : 'grid-cols-3'} mb-8`}>
             <TabsTrigger value="halls" className="flex items-center space-x-2">
               <Icon name="Building2" size={16} />
               <span>Залы</span>
@@ -153,6 +208,22 @@ const Index = () => {
               <Icon name="Settings" size={16} />
               <span>Настройки</span>
             </TabsTrigger>
+            {currentUser === 'admin' && (
+              <>
+                <TabsTrigger value="users" className="flex items-center space-x-2">
+                  <Icon name="Users" size={16} />
+                  <span>Пользователи</span>
+                </TabsTrigger>
+                <TabsTrigger value="warehouse" className="flex items-center space-x-2">
+                  <Icon name="Package" size={16} />
+                  <span>Склад</span>
+                </TabsTrigger>
+                <TabsTrigger value="lamps" className="flex items-center space-x-2">
+                  <Icon name="Lightbulb" size={16} />
+                  <span>Учёт ламп</span>
+                </TabsTrigger>
+              </>
+            )}
           </TabsList>
 
           {/* Halls Tab */}
@@ -372,22 +443,263 @@ const Index = () => {
                   <CardTitle>Панель администратора</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button variant="outline" disabled>
-                    <Icon name="Users" size={16} />
-                    Управление пользователями
-                  </Button>
-                  <Button variant="outline" disabled>
-                    <Icon name="Package" size={16} />
-                    Склад
-                  </Button>
-                  <Button variant="outline" disabled>
-                    <Icon name="Lightbulb" size={16} />
-                    Учёт ламп
-                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    Дополнительные функции администратора доступны в соответствующих вкладках.
+                  </p>
                 </CardContent>
               </Card>
             )}
           </TabsContent>
+
+          {/* Users Tab */}
+          {currentUser === 'admin' && (
+            <TabsContent value="users" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Управление пользователями</h2>
+                <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Icon name="Plus" size={16} />
+                      Добавить пользователя
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Добавить нового пользователя</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <Input
+                        placeholder="ФИО"
+                        value={newUser.name}
+                        onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                      />
+                      <Select onValueChange={(value) => setNewUser({...newUser, role: value})}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Роль" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="admin">Администратор</SelectItem>
+                          <SelectItem value="operator">Оператор</SelectItem>
+                          <SelectItem value="tech">Техник</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        placeholder="Должность"
+                        value={newUser.position}
+                        onChange={(e) => setNewUser({...newUser, position: e.target.value})}
+                      />
+                      <Input
+                        type="date"
+                        placeholder="День рождения"
+                        value={newUser.birthday}
+                        onChange={(e) => setNewUser({...newUser, birthday: e.target.value})}
+                      />
+                      <Input
+                        placeholder="Пароль"
+                        value={newUser.password}
+                        onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                      />
+                      <Button 
+                        onClick={() => {
+                          if (newUser.name && newUser.role && newUser.position && newUser.password) {
+                            setUsers([...users, {
+                              id: users.length + 1,
+                              name: newUser.name,
+                              role: newUser.role,
+                              position: newUser.position,
+                              birthday: newUser.birthday,
+                              online: false,
+                              password: newUser.password
+                            }]);
+                            setNewUser({ name: '', role: '', position: '', birthday: '', password: '' });
+                            setIsAddUserOpen(false);
+                          }
+                        }} 
+                        className="w-full"
+                      >
+                        Добавить
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <div className="grid gap-4">
+                {users.map((user) => (
+                  <Card key={user.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-semibold">{user.name}</h3>
+                            <Badge className={user.online ? 'bg-green-500' : 'bg-gray-500'}>
+                              {user.online ? 'Онлайн' : 'Оффлайн'}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{user.position}</p>
+                          <p className="text-sm text-muted-foreground">День рождения: {user.birthday}</p>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm">
+                            <Icon name="Edit" size={14} />
+                          </Button>
+                          <Button variant="destructive" size="sm">
+                            <Icon name="Trash2" size={14} />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          )}
+
+          {/* Warehouse Tab */}
+          {currentUser === 'admin' && (
+            <TabsContent value="warehouse" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Склад</h2>
+                <Dialog open={isAddWarehouseOpen} onOpenChange={setIsAddWarehouseOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Icon name="Plus" size={16} />
+                      Добавить товар
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Добавить товар на склад</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <Input
+                        placeholder="Название товара"
+                        value={newWarehouseItem.name}
+                        onChange={(e) => setNewWarehouseItem({...newWarehouseItem, name: e.target.value})}
+                      />
+                      <Input
+                        type="number"
+                        placeholder="Количество"
+                        value={newWarehouseItem.quantity}
+                        onChange={(e) => setNewWarehouseItem({...newWarehouseItem, quantity: parseInt(e.target.value) || 0})}
+                      />
+                      <Select onValueChange={(value) => setNewWarehouseItem({...newWarehouseItem, category: value})}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Категория" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Лампы">Лампы</SelectItem>
+                          <SelectItem value="Кабели">Кабели</SelectItem>
+                          <SelectItem value="Аксессуары">Аксессуары</SelectItem>
+                          <SelectItem value="Оборудование">Оборудование</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        onClick={() => {
+                          if (newWarehouseItem.name && newWarehouseItem.quantity > 0 && newWarehouseItem.category) {
+                            setWarehouse([...warehouse, {
+                              id: warehouse.length + 1,
+                              ...newWarehouseItem
+                            }]);
+                            setNewWarehouseItem({ name: '', quantity: 0, category: '' });
+                            setIsAddWarehouseOpen(false);
+                          }
+                        }} 
+                        className="w-full"
+                      >
+                        Добавить
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <div className="grid gap-4">
+                {warehouse.map((item) => (
+                  <Card key={item.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-semibold">{item.name}</h3>
+                            <Badge variant="outline">{item.category}</Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Количество: <span className="font-medium">{item.quantity} шт.</span>
+                          </p>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm">
+                            <Icon name="Edit" size={14} />
+                          </Button>
+                          <Button variant="destructive" size="sm">
+                            <Icon name="Trash2" size={14} />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          )}
+
+          {/* Lamps Tab */}
+          {currentUser === 'admin' && (
+            <TabsContent value="lamps" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Учёт ламп</h2>
+                <div className="flex items-center space-x-2">
+                  <Badge variant="destructive" className="animate-pulse">
+                    <Icon name="AlertTriangle" size={14} />
+                    {lamps.filter(lamp => (lamp.maxHours - lamp.workingHours) <= 48).length} требуют замены
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                {lamps.map((lamp) => {
+                  const remainingHours = lamp.maxHours - lamp.workingHours;
+                  const needsReplacement = remainingHours <= 48;
+                  
+                  return (
+                    <Card key={lamp.id} className={needsReplacement ? 'border-red-500' : ''}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-2">
+                            <div className="flex items-center space-x-2">
+                              <h3 className="font-semibold">Зал {lamp.hallId}</h3>
+                              {needsReplacement && (
+                                <Badge variant="destructive">Требует замены</Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">{lamp.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              Установлена: {new Date(lamp.installDate).toLocaleDateString('ru-RU')}
+                            </p>
+                            <div className="text-sm">
+                              <span className={needsReplacement ? 'text-red-500 font-semibold' : 'text-muted-foreground'}>
+                                Осталось: {remainingHours} часов
+                              </span>
+                              <span className="text-muted-foreground ml-2">
+                                ({lamp.workingHours}/{lamp.maxHours} ч.)
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm">
+                              <Icon name="RotateCcw" size={14} />
+                              Заменить
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>
