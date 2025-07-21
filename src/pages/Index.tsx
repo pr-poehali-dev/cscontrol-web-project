@@ -178,14 +178,27 @@ const Index = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                       <Button 
-                        variant={halls.find(h => h.id === selectedHall)?.sessionActive ? "destructive" : "default"}
-                        onClick={() => toggleSession(selectedHall)}
+                        variant="default"
+                        onClick={() => setHalls(halls.map(hall => 
+                          hall.id === selectedHall ? { ...hall, sessionActive: true } : hall
+                        ))}
                         className="h-16"
                       >
                         <Icon name="Play" size={20} />
-                        {halls.find(h => h.id === selectedHall)?.sessionActive ? 'Выключить сеанс' : 'Включить сеанс'}
+                        Включить сеанс
+                      </Button>
+                      
+                      <Button 
+                        variant="destructive"
+                        onClick={() => setHalls(halls.map(hall => 
+                          hall.id === selectedHall ? { ...hall, sessionActive: false } : hall
+                        ))}
+                        className="h-16"
+                      >
+                        <Icon name="Square" size={20} />
+                        Выключить сеанс
                       </Button>
                       
                       <Button variant="secondary" className="h-16">
